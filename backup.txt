@@ -1,0 +1,178 @@
+from pytube import YouTube
+import yt_dlp
+import customtkinter as ctk
+from CTkMessagebox import CTkMessagebox
+
+import sys
+import os
+
+# default button color theme
+# ctk.set_default_color_theme("blue")
+
+dark_mode_color=('#8f75ff', '#5d8ade')
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+def selected():
+    if segemented_button_var.get() == "Youtube MP4":
+        # YOUTUBE URL
+        download("youtubeMP4")
+    elif segemented_button_var.get() == "Facebook vids | Instagram Reels | Tiktok":
+        # FACEBOOK URL
+        download("fb_ig_reels")
+    elif segemented_button_var.get() == "Youtube MP3 | Playlist":
+        # YOUTUBE MP3
+        download("youtubeMP3")
+
+def progress_hook(d):
+    if d['status'] == 'downloading':
+        progressbar.set(round(float(d['downloaded_bytes'])/float(d['total_bytes'])*100,1))
+        # print (dl_status)
+    # if d['status'] == 'finished':
+    #     filename=d['filename']
+    #     print(filename)
+
+def download(downloadType):
+    url = url_entry.get()
+    if downloadType == "youtubeMP4":
+		# YOUTUBE MP4
+        # try:
+        #     yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
+			
+        #     video = yt.streams.filter(progressive=True, file_extension='mp4').desc().first()
+        #     video.download("videoYT")
+        #     CTkMessagebox(title="DONE!", icon="check", width=75, height=30, message="Download Complete 👻")
+        #     url_entry.delete(0, ctk.END)
+        # except Exception as e:
+        #     CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon='./assets/819890869792145418.webp')
+        #     # CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon=resource_path("819890869792145418.webp"))
+        #     print(f"An error occurred: {e}")
+        try:
+            ydl_opts = {
+                'format': "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                'outtmpl': os.path.join("./videoYT", '%(title)s.%(ext)s')
+			}
+            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                u.download([url])
+            CTkMessagebox(title="DONE!", icon="check",width=75, height=30, message="Download Complete 👻")
+            progressbar.set(0)
+            url_entry.delete(0, ctk.END)
+        except Exception as e:
+            CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon='./assets/819890869792145418.webp')
+            # CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon=resource_path("819890869792145418.webp"))
+            print(f"An error occurred: {e}")
+
+    if downloadType == "fb_ig_reels":
+		# FACEBOOK VIDS AND IG REELS
+        try:
+            ydl_opts = {
+				'format': 'bestvideo+bestaudio/best',
+				'merge_output_format': 'mp4',
+				'outtmpl': os.path.join("./FB_IG_TK", '%(title)s.%(ext)s'),
+                'progress_hooks': [progress_hook]
+			}
+            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                u.download([url])
+            CTkMessagebox(title="DONE!", icon="check",width=75, height=30, message="Download Complete 👻")
+            progressbar.set(0)
+            url_entry.delete(0, ctk.END)
+        except Exception as e:
+            CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon='./assets/819890869792145418.webp')
+            # CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon=resource_path("819890869792145418.webp"))
+            print(f"An error occurred: {e}")
+
+    if downloadType == "youtubeMP3":
+		# YOUTUBE MP3
+        try:
+            ydl_opts = {
+			'format': 'wav/bestaudio/best',
+			'postprocessors': [{
+				'key': 'FFmpegExtractAudio',
+				'preferredcodec': 'wav',
+			}],
+			'outtmpl': os.path.join("./YTMP3", '%(title)s.%(ext)s'),
+            'progress_hooks': [progress_hook]
+			}
+            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                u.download([url])
+            CTkMessagebox(title="DONE!", icon="check", width=75, height=30, message="Download Complete 👻")
+            progressbar.set(0)
+            url_entry.delete(0, ctk.END)
+        except Exception as e:
+            CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon='./assets/819890869792145418.webp')
+            # CTkMessagebox(title="ERROR!", message="MAYBE WRONG LINK OR\nDOWNLOAD TYPE!", icon=resource_path("819890869792145418.webp"))
+            print(f"An error occurred: {e}")
+
+def open_folder():
+    os.startfile(r'')
+
+def close_window():
+    window.quit()
+    
+def change_appearance_mode_event(values):
+    if values == "System":
+        ctk.set_appearance_mode("System")
+    elif values == "Light":
+        ctk.set_appearance_mode("Light")
+    elif values == "Dark":
+        ctk.set_appearance_mode("Dark")
+
+window = ctk.CTk()
+window.geometry("550")
+window.minsize(550, 300)
+window.maxsize(550, 300)
+window.title("Kuro Downloader")
+
+# progress bar
+progressbar_label = ctk.CTkLabel(window, text="Download Progress")
+progressbar_label.place(relx=.05, rely=.4, anchor=ctk.W)
+progressbar = ctk.CTkProgressBar(window, progress_color=dark_mode_color, width=250, orientation="horizontal")
+progressbar.set(0)
+progressbar.place(relx=.05, rely=.45, anchor=ctk.W)
+
+# Info
+info_label = ctk.CTkLabel(window, text="HEY!\nNot responding = processing, chill ;3\n\nCHOOSE DOWNLOAD TYPE ABOVE!\n\nIf you want to stop downloading, just close the program")
+info_label.place(relx=.05, rely=.65, anchor=ctk.W)
+ver_label = ctk.CTkLabel(window, text="Ver 0.1")
+ver_label.place(relx=.5, rely=1, anchor=ctk.S)
+
+# Segmented Button
+segemented_button_var = ctk.StringVar(value="youtubeMP4")  # set initial value
+segemented_button = ctk.CTkSegmentedButton(window, selected_color=dark_mode_color, values=["Youtube MP4", "Facebook vids | Instagram Reels | Tiktok", "Youtube MP3 | Playlist"],variable=segemented_button_var)
+segemented_button.pack(padx=20, pady=10, anchor=ctk.N)
+
+# url label
+url_label = ctk.CTkLabel(window, text="Enter URL:")
+url_label.place(relx=.05, rely=.15, anchor=ctk.NW)
+
+# url entry box
+url_entry = ctk.CTkEntry(window, width=250, placeholder_text="Enter URL")
+url_entry.place(relx=.05, rely=.25, anchor=ctk.NW)
+
+# download button
+download_btn = ctk.CTkButton(window, fg_color=dark_mode_color, width=14, hover_color="medium purple", text="Download", command=selected)
+download_btn.place(relx=.05, rely=.95, anchor=ctk.SW)
+
+# open folder button | WORKING
+# download_btn = ctk.CTkButton(window, width=14, hover_color="medium purple", text="Open Folder", command=open_folder)
+# download_btn.place(relx=.15, rely=.95, anchor=ctk.SW)
+
+# appearance combo box
+appearance_mode_label = ctk.CTkLabel(window, text="Appearance:")
+appearance_mode_label.place(relx=.95, rely=.15, anchor=ctk.NE)
+appearance_mode_optionemenu = ctk.CTkOptionMenu(window, fg_color=dark_mode_color, button_color=dark_mode_color, width=24, values=["System", "Dark", "Light"],command=change_appearance_mode_event)
+appearance_mode_optionemenu.place(relx=.95, rely=.25, anchor=ctk.NE)
+
+# quit button
+quit_btn = ctk.CTkButton(window, fg_color=dark_mode_color, width=24, hover_color="orange red", text="Quit", command=close_window)
+quit_btn.place(relx=.95, rely=.95, anchor=ctk.SE)
+
+window.mainloop()
