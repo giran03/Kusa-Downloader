@@ -19,7 +19,7 @@ def resource_path(relative_path):
 app_ver = '@Girandayoo | Ver 1.0'
 dark_mode_color=('#8f75ff', '#5d8ade')
 window_icon = resource_path("favico.ico") #resource_path("favico.ico") | './assets/favico.ico'
-warning_icon = resource_path("819890869792145418.webp") #resource_path("819890869792145418.webp") | './assets/819890869792145418.webp'
+warning_icon = './assets/819890869792145418.webp' #resource_path("819890869792145418.webp") | './assets/819890869792145418.webp'
 
 # widgets placement
 default_left_most_val = 0.03
