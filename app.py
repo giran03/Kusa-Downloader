@@ -1,18 +1,24 @@
-from pytube import YouTube
 import yt_dlp
 import customtkinter
 from CTkMessagebox import CTkMessagebox
-from PIL import Image
 
 import sys
 import os
 
-# default button color theme
-# self.set_default_color_theme("blue")
+def resource_path(relative_path):
+            """ Get absolute path to resource, works for dev and for PyInstaller """
+            try:
+                # PyInstaller creates a temp folder and stores path in _MEIPASS
+                base_path = sys._MEIPASS
+            except Exception:
+                base_path = os.path.abspath(".")
 
+            return os.path.join(base_path, relative_path)
+
+app_ver = 'Ver 0.2 (beta)'
 dark_mode_color=('#8f75ff', '#5d8ade')
-warning_icon = './assets/819890869792145418.webp' #resource_path("819890869792145418.webp")
-light_mode_image = './assets/app_icon.png' #resource_path("app_icon.png")
+window_icon = resource_path("favico.ico") #resource_path("favico.ico") | './assets/favico.ico'
+warning_icon = resource_path("819890869792145418.webp") #resource_path("819890869792145418.webp") | './assets/819890869792145418.webp'
 
 # widgets placement
 default_left_most_val = 0.03
@@ -23,16 +29,6 @@ default_bottom_most_val = 0.9
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        
-        def resource_path(relative_path):
-            """ Get absolute path to resource, works for dev and for PyInstaller """
-            try:
-                # PyInstaller creates a temp folder and stores path in _MEIPASS
-                base_path = sys._MEIPASS
-            except Exception:
-                base_path = os.path.abspath(".")
-
-            return os.path.join(base_path, relative_path)
 
         def progress_hook(d):
             if d['status'] == 'downloading':
@@ -83,7 +79,7 @@ class App(customtkinter.CTk):
                             ydl_opts = {
                                 'format': 'bestvideo+bestaudio/best',
                                 'merge_output_format': 'mp4',
-                                'outtmpl': os.path.join("./FB_IG_TK", '%(title)s.%(ext)s'),
+                                'outtmpl': os.path.join("./FB_IG_TWI_TK", '%(title)s.%(ext)s'),
                                 'progress_hooks': [progress_hook]
                             }
                             with yt_dlp.YoutubeDL(ydl_opts) as u:
@@ -124,25 +120,37 @@ class App(customtkinter.CTk):
             elif values == "Dark":
                 customtkinter.set_appearance_mode("Dark")
 
-        self.title("Kuro Downloader")   
-        self.minsize(600, 300)
-        self.maxsize(600, 300)
+        self.title("Kuro Downloader")
+        self.iconbitmap(window_icon)
+        self.minsize(600, 400)
+        self.maxsize(600, 400)
+
+        # load download type info     
+        download_info_label = customtkinter.CTkTextbox(self, width=250, height=180)
+        download_info_label.insert("0.0", "\tDOWNLOADING TIPS!\n\nCopy paste the YT link from the search   bar or use 'copy link address'\n\n")
+        download_info_label.insert("5.0", "Use links from 'Share button > Copy Link' in FB Vid, IG Reels, Twitter Vid, Tiktok Vid\n\nDownloads are located where the\napplication is placed.")
+        download_info_label.configure(state="disabled")
+        download_info_label.place(relx=default_right_most_val, rely=default_top_most_val+.4, anchor=customtkinter.E)
 
         # progress bar
-        progressbar_label = customtkinter.CTkLabel(self, text="Download Progress")
-        # progressbar_label.place(relx=.05, rely=.4, anchor=customtkinter.W)
         progressbar = customtkinter.CTkProgressBar(self, progress_color=dark_mode_color, width=250, orientation="horizontal")
         progressbar.set(0)
         progressbar.place(relx=default_left_most_val, rely=default_top_most_val+.4, anchor=customtkinter.W)
 
         # Info
-        info_label = customtkinter.CTkLabel(self, text="HEY!\nNot responding = processing, chill ;3\n\nCHOOSE DOWNLOAD TYPE ABOVE!\n\nIf you want to stop downloading, just close the program")
-        ver_label = customtkinter.CTkLabel(self, text="Ver 0.1")
+        info_label = customtkinter.CTkTextbox(self, width=250, height=110)
+        info_label.insert("0.0", "Zup!\nNot responding = processing, chill ;3\n\nto stop downloading, just force close the program")
+        info_label.configure(state="disabled")
+        info_label.place(relx=default_left_most_val, rely=default_bottom_most_val, anchor=customtkinter.SW)
+        ver_label = customtkinter.CTkLabel(self, text=app_ver)
+        ver_label.place(relx=default_right_most_val, rely=default_bottom_most_val+.1, anchor=customtkinter.SE)
 
         # Segmented Button
         segmented_button_label = customtkinter.CTkLabel(self, text="CHOOSE DOWNLOAD TYPE")
         segemented_button_var = customtkinter.StringVar(value="YOUTUBE MP4")  # set initial value
-        segemented_button = customtkinter.CTkSegmentedButton(self, height=40, selected_color=dark_mode_color, values=["YOUTUBE MP4", "FB | IG | TWITTER | TIKTOK", "YOUTUBE MP3"],variable=segemented_button_var)
+        segemented_button = customtkinter.CTkSegmentedButton(self, height=40, selected_color=dark_mode_color, 
+                                                             values=["YOUTUBE MP4", "FB | IG | TWITTER | TIKTOK", "YOUTUBE MP3"],
+                                                             variable=segemented_button_var)
         segmented_button_label.place(relx=default_left_most_val, rely=default_top_most_val, anchor=customtkinter.NW)
         segemented_button.place(relx=default_right_most_val, rely=default_top_most_val, anchor=customtkinter.NE)
 
@@ -153,12 +161,12 @@ class App(customtkinter.CTk):
         url_entry.place(relx=default_left_most_val, rely=default_top_most_val+.3 , anchor=customtkinter.W)
 
         # appearance combo box
-        appearance_mode_label = customtkinter.CTkLabel(self, text="Appearance:")
-        appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self, fg_color=dark_mode_color, button_color=dark_mode_color, width=24, values=["System", "Dark", "Light"],command=change_appearance_mode_event)
+        # appearance_mode_label = customtkinter.CTkLabel(self, text="Appearance:")
+        # appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self, fg_color=dark_mode_color, button_color=dark_mode_color, width=24, values=["System", "Dark", "Light"],command=change_appearance_mode_event)
  
         # download button
         download_btn = customtkinter.CTkButton(self, fg_color=dark_mode_color, width=14, hover_color="medium purple", text="Download", command=selected)
-        download_btn.place(relx=default_left_most_val, rely=default_bottom_most_val, anchor=customtkinter.SW)
+        download_btn.place(relx=default_left_most_val, rely=default_top_most_val+.5, anchor=customtkinter.W)
         # download_btn.grid(row=7, column=0, padx=10, pady=(10, 0), sticky="sw")
 
         # quit button
