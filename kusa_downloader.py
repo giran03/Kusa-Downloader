@@ -18,7 +18,7 @@ def resource_path(relative_path):
 
             return os.path.join(base_path, relative_path)
 
-app_ver = '@Girandayoo | Ver 1.0'
+app_ver = '@Girandayoo | Ver 2.0'
 dark_mode_color=('#8f75ff', '#5d8ade')
 # window_icon = resource_path("favico.ico") #resource_path("favico.ico") | './assets/favico.ico'
 # warning_icon = resource_path("suisei.webp") #resource_path("suisei.webp") | './assets/suisei.webp'
