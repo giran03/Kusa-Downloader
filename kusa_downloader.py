@@ -1,7 +1,9 @@
-import yt_dlp
+from yt_dlp import YoutubeDL
 import customtkinter
 from CTkMessagebox import CTkMessagebox
 import subprocess
+from PIL import Image
+import optparse
 
 import sys
 import os
@@ -18,8 +20,8 @@ def resource_path(relative_path):
 
 app_ver = '@Girandayoo | Ver 1.0'
 dark_mode_color=('#8f75ff', '#5d8ade')
-window_icon = resource_path("favico.ico") #resource_path("favico.ico") | './assets/favico.ico'
-warning_icon = './assets/819890869792145418.webp' #resource_path("819890869792145418.webp") | './assets/819890869792145418.webp'
+# window_icon = resource_path("favico.ico") #resource_path("favico.ico") | './assets/favico.ico'
+# warning_icon = resource_path("suisei.webp") #resource_path("suisei.webp") | './assets/suisei.webp'
 
 # widgets placement
 default_left_most_val = 0.03
@@ -52,6 +54,13 @@ class DownloadFailedWindow(customtkinter.CTkToplevel):
         self.minsize(450,80)
         self.maxsize(450,80)
         self.title("DOWNLOAD FAILED!")
+        
+        # my_image = customtkinter.CTkImage(light_image=Image.open(warning_icon),
+        #                           dark_image=Image.open(warning_icon),
+        #                           size=(30, 30))
+        # image_label = customtkinter.CTkLabel(self, image=my_image, text="")
+        image_label = customtkinter.CTkLabel(self, text="")
+        image_label.place(relx=.05, rely=.5, anchor=customtkinter.W)
         
         failed_text = "Must be wrong link, download type, or file already exists!"
         self.success_text = customtkinter.CTkLabel(self, text=failed_text)
@@ -119,7 +128,7 @@ class App(customtkinter.CTk):
                                 'progress_hooks': [progress_hook],
                                 'noplaylist': True
                             }
-                            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                            with YoutubeDL(ydl_opts) as u:
                                 u.download([url])
                         except Exception as e:
                             url_failed(e)
@@ -134,7 +143,7 @@ class App(customtkinter.CTk):
                                 'progress_hooks': [progress_hook],
                                 'noplaylist': True
                             }
-                            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                            with YoutubeDL(ydl_opts) as u:
                                 u.download([url])
                         except Exception as e:
                             url_failed(e)
@@ -152,11 +161,11 @@ class App(customtkinter.CTk):
                             'progress_hooks': [progress_hook],
                             'noplaylist': True
                             }
-                            with yt_dlp.YoutubeDL(ydl_opts) as u:
+                            with YoutubeDL(ydl_opts) as u:
                                 u.download([url])
                         except Exception as e:
                             url_failed(e)
-
+                            
         def open_folder():
             if not os.path.exists('downloads'):
                 os.makedirs('downloads')
@@ -166,22 +175,21 @@ class App(customtkinter.CTk):
             self.quit()
     
         self.title("Kusa Downloader")
-        self.iconbitmap(window_icon)
-        self.minsize(600, 400)
-        self.maxsize(600, 400)
+        # self.iconbitmap(window_icon)
+        self.minsize(700, 400)
+        self.maxsize(700, 400)
 
         # load download type info     
-        download_info_label = customtkinter.CTkTextbox(self, wrap='word', width=250, height=250)
+        download_info_label = customtkinter.CTkTextbox(self, wrap='word', width=300, height=250)
         download_info_label.insert("0.0", "\tDOWNLOADING TIPS\n\t            (>‿◠)✌\n\nCopy paste the YT link from the search bar or use 'copy link address'\n\n")
         download_info_label.insert("5.0", "Use links from 'Share button > Copy Link' in FB Vid, IG Reels, Twitter Vid, Tiktok Vid\n")
         download_info_label.insert("11.0", "Check all of the supported sites here: https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md\n\n")
         download_info_label.insert("14.0", "Not responding = processing,\nchill (ɔ◔‿◔)ɔ ♥\n\nto stop from downloading, just force close me (╥﹏╥)\n\n")
-        # download_info_label.insert("19.0", "After clicking  download button...\n\nlet me cook bruh dont rush\n\n")
         download_info_label.configure(state="disabled")
         download_info_label.place(relx=default_right_most_val, rely=default_top_most_val+.45, anchor=customtkinter.E)
 
         # Info
-        info_label = customtkinter.CTkTextbox(self, wrap='word', width=250, height=160)
+        info_label = customtkinter.CTkTextbox(self, wrap='word', width=300, height=160)
         info_label.place(relx=default_left_most_val, rely=default_bottom_most_val, anchor=customtkinter.SW)
         ver_label = customtkinter.CTkLabel(self, text=app_ver)
         ver_label.place(relx=default_right_most_val, rely=default_bottom_most_val+.1, anchor=customtkinter.SE)
@@ -192,18 +200,18 @@ class App(customtkinter.CTk):
         segemented_button = customtkinter.CTkSegmentedButton(self, height=40, selected_color=dark_mode_color, 
                                                              values=["YOUTUBE MP4", "FB | IG | TWITTER | TIKTOK", "YOUTUBE MP3"],
                                                              variable=segemented_button_var)
-        segmented_button_label.place(relx=default_left_most_val, rely=default_top_most_val, anchor=customtkinter.NW)
+        segmented_button_label.place(relx=default_left_most_val+.05, rely=default_top_most_val+.02, anchor=customtkinter.NW)
         segemented_button.place(relx=default_right_most_val, rely=default_top_most_val, anchor=customtkinter.NE)
 
         # url label and entry box
         url_label = customtkinter.CTkLabel(self, text="Enter URL:")
-        url_entry = customtkinter.CTkEntry(self, width=250, placeholder_text="Enter URL")
+        url_entry = customtkinter.CTkEntry(self, width=300, placeholder_text="Enter URL")
         url_label.place(relx=default_left_most_val, rely=default_top_most_val+.2 , anchor=customtkinter.W)
         url_entry.place(relx=default_left_most_val, rely=default_top_most_val+.3 , anchor=customtkinter.W)
 
         # open downloads folder button
         open_folder_btn = customtkinter.CTkButton(self, fg_color=dark_mode_color, width=14, hover_color="medium purple", text="Downloads Folder", command=open_folder)
-        open_folder_btn.place(relx=default_left_most_val+.13, rely=default_top_most_val+.4, anchor=customtkinter.W)
+        open_folder_btn.place(relx=default_left_most_val+.12, rely=default_top_most_val+.4, anchor=customtkinter.W)
  
         # download button
         download_btn = customtkinter.CTkButton(self, fg_color=dark_mode_color, width=14, hover_color="medium purple", text="Download", command=selected)
